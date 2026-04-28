@@ -45,3 +45,33 @@ Terraform permet de créer l'infrastructure Azure de manière déclarative et ve
 ### Ansible
 
 Ansible est fourni comme complément si un déploiement sur VM Azure est demandé. Dans cette version, le déploiement principal se fait via Azure Web App for Containers, plus simple pour le projet.
+
+
+itHub Actions → SSH vers ta VM Azure → pull/build/restart Docker
+
+Architecture simple
+Application Flask dans ton repo GitHub
+VM Ubuntu sur Azure
+Docker installé sur la VM
+Pipeline GitHub Actions qui :
+lance les tests
+se connecte en SSH à la VM
+récupère le code
+rebuild le container
+relance l’application
+Avantage
+
+Tu n’as pas besoin de :
+
+App Registration
+Entra ID
+Service Principal
+Azure Credentials
+ACR
+Azure Web App
+
+Tu as seulement besoin de :
+
+une VM Azure
+une clé SSH
+des GitHub Secrets
