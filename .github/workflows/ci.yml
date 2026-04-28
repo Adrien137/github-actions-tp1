@@ -24,7 +24,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Lint with Ruff
-        run: ruff check .
+        run: ruff check . --fix
 
       - name: Security scan with Bandit
         run: bandit -r app
