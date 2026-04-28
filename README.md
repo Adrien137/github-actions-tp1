@@ -1,10 +1,10 @@
-# Projet Fil Rouge – API REST Task Manager
+# Projet Usine Logiciel – API REST Task Manager
 
 ## Présentation
 
 Projet réalisé dans le cadre du module d’usine logicielle.
 
-L’objectif est de mettre en place une petite API REST en Python avec Flask permettant la gestion de tâches (CRUD), tout en intégrant une pipeline CI/CD avec GitHub Actions, Docker et de bonnes pratiques GitOps.
+L’objectif est de mettre en place une petite API REST en Python avec Flask permettant la gestion de tâches (CRUD), tout en intégrant une pipeline CI/CD avec GitHub Actions, Docker, Terraform, ansible et des bonnes pratiques GitOps.
 
 ---
 
@@ -22,8 +22,29 @@ Exemples de routes :
 
 * `GET /health`
 * `GET /api/tasks`
+* `POST /api/tasks`
+* `PUT /api/tasks/{id}`
+* `DELETE /api/tasks/{id}`
 
 ---
+
+## Réalisation initiale du projet
+
+Le projet était initialement prévu pour être déployé entièrement sur Azure avec une approche DevOps complète :
+
+déploiement automatisé sur Azure Web App
+stockage de l’image dans Azure Container Registry (ACR)
+authentification via Service Principal avec AZURE_CREDENTIALS
+Infrastructure as Code avec Terraform
+configuration automatisée avec Ansible
+intégration complète avec GitHub Actions
+
+L’objectif était de reproduire une vraie usine logicielle moderne avec CI/CD, conteneurisation, déploiement cloud et automatisation de l’infrastructure.
+
+Cependant, les limitations de droits sur Azure (notamment sur Entra ID et App Registration) ont empêché la création du Service Principal nécessaire à l’authentification GitHub → Azure.
+
+Une adaptation a donc été mise en place avec un déploiement local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
+
 
 ## Déploiement
 
@@ -140,9 +161,11 @@ Ils permettent de stocker de façon sécurisée les informations sensibles (cred
 
 Exemple :
 
-* VM_HOST
-* VM_USER
-* VM_SSH_KEY
+* AZURE_CREDENTIALS
+* ACR_NAME
+* ACR_LOGIN_SERVER
+* AZURE_WEBAPP_NAME
+* AZURE_RESOURCE_GROUP
 
 ---
 
@@ -160,6 +183,25 @@ Exemple :
 
 ---
 
-## Auteur
+## Supervision
 
-Projet réalisé dans le cadre du projet fil rouge – Usine Logicie
+Une route de supervision simple a été ajoutée :
+
+```text
+GET /health
+```
+
+Elle permet de vérifier rapidement que l’application fonctionne correctement.
+
+Exemple de retour :
+
+```json
+{
+  "status": "ok",
+  "service": "task-api"
+}
+```
+
+Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
+
+---
