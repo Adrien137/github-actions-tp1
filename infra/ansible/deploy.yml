@@ -1,0 +1,29 @@
+---
+- name: Deploy Task API with Docker
+  hosts: web
+  become: true
+  vars:
+    app_image: "task-api:latest"
+    app_port: 5000
+
+  tasks:
+    - name: Install Docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+        update_cache: true
+
+    - name: Start Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Run application container
+      community.docker.docker_container:
+        name: task-api
+        image: "{{ app_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "{{ app_port }}:5000"
