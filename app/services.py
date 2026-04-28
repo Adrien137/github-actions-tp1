@@ -1,8 +1,8 @@
 from typing import Any
 
-_TASKS: list[dict[str, Any]] = [
-    {'id': 1, 'title': 'Préparer le projet fil rouge', 'done': False},
-    {'id': 2, 'title': 'Configurer la pipeline CI/CD', 'done': False},
+_TASKS = [
+    {'id': 1, 'title': 'Créer pipeline GitHub Actions', 'done': True},
+    {'id': 2, 'title': 'Déployer container Docker', 'done': False},
 ]
 _NEXT_ID = 3
 
