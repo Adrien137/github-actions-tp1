@@ -30,7 +30,9 @@ jobs:
         run: bandit -r app
 
       - name: Run tests with coverage
-        run: pytest --cov=app --cov-report=term-missing --cov-fail-under=80
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: python -m pytest --cov=app --cov-report=term-missing --cov-fail-under=80
 
   docker-build:
     runs-on: ubuntu-latest
