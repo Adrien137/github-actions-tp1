@@ -1,6 +1,12 @@
 from flask import Blueprint, jsonify, request
 
-from .services import add_task, delete_task, get_task, list_tasks, update_task
+from .services import (
+    add_task,
+    delete_task,
+    get_task,
+    list_tasks,
+    update_task,
+)
 
 
 api = Blueprint("api", __name__)
