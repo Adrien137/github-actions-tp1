@@ -8,6 +8,15 @@ api = Blueprint('api', __name__)
 def health():
     return jsonify({'status': 'ok', 'service': 'task-api'}), 200
 
+@api.route("/")
+def home():
+    return {
+        "message": "Task Manager API fonctionne",
+        "endpoints": {
+            "health": "/health",
+            "tasks": "/tasks"
+        }
+    }
 
 @api.get('/api/tasks')
 def tasks_list():
