@@ -85,31 +85,42 @@ docker rm task-api
 
 ---
 
-## Gestion des tâches avec curl (PowerShell)
+## Gestion des tâches avec Invoke-RestMethod sur PowerShell
 
 ## Ajouter une tâche
 
 ```powershell
-curl -Method POST `
-  -Uri http://localhost:5000/api/tasks `
+$body = '{"title":"Nouvelle tache"}'
+
+Invoke-RestMethod -Method POST `
+  -Uri "http://localhost:5000/api/tasks" `
   -ContentType "application/json" `
-  -Body '{"title":"Nouvelle tâche"}'
+  -Body $body
 ```
 
 ## Modifier une tâche
 
 ```powershell
-curl -Method PUT `
-  -Uri http://localhost:5000/api/tasks/1 `
+$body = '{"done": true}'
+
+Invoke-RestMethod -Method PUT `
+  -Uri "http://localhost:5000/api/tasks/1" `
   -ContentType "application/json" `
-  -Body '{"done": true}'
+  -Body $body
 ```
 
 ## Supprimer une tâche
 
 ```powershell
-curl -Method DELETE `
-  -Uri http://localhost:5000/api/tasks/1
+Invoke-RestMethod -Method DELETE `
+  -Uri "http://localhost:5000/api/tasks/1"
+```
+
+## Pour voir les tâches
+
+```Powershell
+Invoke-RestMethod -Method GET `
+  -Uri "http://localhost:5000/api/tasks"
 ```
 
 ---
