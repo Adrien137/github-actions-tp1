@@ -32,12 +32,12 @@ Exemples de routes :
 
 Le projet était initialement prévu pour être déployé entièrement sur Azure avec une approche DevOps complète :
 
-déploiement automatisé sur Azure Web App
-stockage de l’image dans Azure Container Registry (ACR)
-authentification via Service Principal avec AZURE_CREDENTIALS
-Infrastructure as Code avec Terraform
-configuration automatisée avec Ansible
-intégration complète avec GitHub Actions
+- Déploiement automatisé sur Azure Web App
+- Stockage de l’image dans Azure Container Registry (ACR)
+- Authentification via le Service Principal grâce aux AZURE_CREDENTIALS
+- Infrastructure as Code avec Terraform
+- Configuration automatisée de l'infrastructure Terraform avec Ansible
+- intégration complète avec GitHub Actions
 
 L’objectif était de reproduire une vraie usine logicielle moderne avec CI/CD, conteneurisation, déploiement cloud et automatisation de l’infrastructure.
 
@@ -85,31 +85,42 @@ docker rm task-api
 
 ---
 
-## Gestion des tâches avec curl (PowerShell)
+## Gestion des tâches avec Invoke-RestMethod sur PowerShell
 
 ## Ajouter une tâche
 
 ```powershell
-curl -Method POST `
-  -Uri http://localhost:5000/api/tasks `
+$body = '{"title":"Nouvelle tache"}'
+
+Invoke-RestMethod -Method POST `
+  -Uri "http://localhost:5000/api/tasks" `
   -ContentType "application/json" `
-  -Body '{"title":"Nouvelle tâche"}'
+  -Body $body
 ```
 
 ## Modifier une tâche
 
 ```powershell
-curl -Method PUT `
-  -Uri http://localhost:5000/api/tasks/1 `
+$body = '{"done": true}'
+
+Invoke-RestMethod -Method PUT `
+  -Uri "http://localhost:5000/api/tasks/1" `
   -ContentType "application/json" `
-  -Body '{"done": true}'
+  -Body $body
 ```
 
 ## Supprimer une tâche
 
 ```powershell
-curl -Method DELETE `
-  -Uri http://localhost:5000/api/tasks/1
+Invoke-RestMethod -Method DELETE `
+  -Uri "http://localhost:5000/api/tasks/1"
+```
+
+## Pour voir les tâches
+
+```Powershell
+Invoke-RestMethod -Method GET `
+  -Uri "http://localhost:5000/api/tasks"
 ```
 
 ---
@@ -202,6 +213,6 @@ Exemple de retour :
 }
 ```
 
-Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
+Cette route peut ensuite être utilisée/récupérer par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
 
 ---
