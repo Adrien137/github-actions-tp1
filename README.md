@@ -191,6 +191,7 @@ Exemple :
 * Bandit
 * Pytest
 * Azure (VM)
+* Trivy
 
 ---
 
