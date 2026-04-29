@@ -194,25 +194,64 @@ Exemple :
 
 ---
 
-## Supervision
+## Supervision et métriques
+
+L’application possède deux endpoints de supervision :
+
+GET /health
+GET /metrics
+/health
+
+Permet de vérifier rapidement si l’application et le conteneur Docker sont bien disponibles.
+
+Exemple :
+
+{
+  "status": "ok",
+  "service": "task-api"
+}
+
+---
+
+/metrics
+
+Permet d’avoir une supervision plus détaillée de l’application.
+
+Exemple de métriques récupérées :
+
+nom du service
+version de l’application
+nombre total de tâches
+nombre de tâches terminées
+nombre de tâches en attente
+
+Exemple :
+
+{
+  "service": "task-api",
+  "version": "1.0.0",
+  "total_tasks": 5,
+  "completed_tasks": 2,
+  "pending_tasks": 3
+}
+
+Cela permet de suivre simplement l’état de l’application et d’avoir une première approche de supervision.
+
+---
+
+Supervision
 
 Une route de supervision simple a été ajoutée :
 
-```text
 GET /health
-```
 
 Elle permet de vérifier rapidement que l’application fonctionne correctement.
 
 Exemple de retour :
 
-```json
 {
   "status": "ok",
   "service": "task-api"
 }
-```
 
-Cette route peut ensuite être utilisée/récupérer par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
-
----
+Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
