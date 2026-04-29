@@ -135,7 +135,8 @@ La pipeline se lance automatiquement sur les branches `develop` et ensuite vers 
 2. Scan sécurité avec Bandit
 3. Lancement des tests avec pytest
 4. Vérification de la couverture de tests
-5. Build de l’image Docker
+5. Analyse qualité avec SonarCloud
+6. Build de l’image Docker
 
 Si une étape échoue, la pipeline s’arrête.
 
@@ -143,15 +144,16 @@ Si une étape échoue, la pipeline s’arrête.
 
 ## GitOps / Git Flow
 
-Le développement se fait sur la branche secondaire :
+Le développement se fait sur des branches secondaires :
 
 ```text
 develop
+features/nom-de-la-feature
 ```
 
 ### Processus
 
-1. Développement sur `develop`
+1. Création d'une nouvelle branche (exemple: `features/nom-de-la-feature`)
 2. Push sur GitHub
 3. GitHub Actions lance les tests
 4. Si tout est valide → merge vers `main`
@@ -172,11 +174,21 @@ Ils permettent de stocker de façon sécurisée les informations sensibles (cred
 
 Exemple :
 
+En temps normal, la nomenclature des secrets à utiliser seraient :
+
 * AZURE_CREDENTIALS
 * ACR_NAME
 * ACR_LOGIN_SERVER
 * AZURE_WEBAPP_NAME
 * AZURE_RESOURCE_GROUP
+
+Mais par soucis de compte Azure, la création de la VM a été réalisée depuis notre machine (avec terraform init, plan et apply) :
+
+* SONAR_TOKEN
+* VM_APP_PATH
+* VM_HOST
+* VM_SSH_KEY
+* VM_USER
 
 ---
 
@@ -189,6 +201,7 @@ Exemple :
 * GitHub Actions
 * Ruff
 * Bandit
+* SonarCloud
 * Pytest
 * Azure (VM)
 
