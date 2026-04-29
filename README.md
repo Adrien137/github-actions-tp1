@@ -44,8 +44,9 @@ L’objectif était de reproduire une vraie usine logicielle moderne avec CI/CD,
 
 Cependant, les limitations de droits sur Azure (notamment sur Entra ID et App Registration) ont empêché la création du Service Principal nécessaire à l’authentification GitHub → Azure.
 
-Une adaptation a donc été mise en place avec un déploiement au préalable de la VM sur azure puis une connexion ssh vers la vm afin d'executer la suite de la pipeline local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
+Une adaptation a donc été mise en place avec un déploiement au préalable de la VM sur azure puis une connexion ssh vers la vm lors du deployoiement dans la pipeline grâce au clé secret afin d'executer la suite de la pipeline.
 
+Nous avons également mis en place un déploiement en local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
 
 ## Déploiement
 
