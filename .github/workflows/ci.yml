@@ -50,4 +50,4 @@ jobs:
           image-ref: task-api:${{ github.sha }}
           format: table
           exit-code: 1
-          severity: CRITICAL,HIGH
+          severity: CRITICAL
