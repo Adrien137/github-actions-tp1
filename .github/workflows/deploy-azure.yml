@@ -29,5 +29,8 @@ jobs:
 
             sudo apt-get install -y docker-compose
 
+            sudo docker stop task-api || true
+            sudo docker rm task-api || true
+
             sudo docker-compose down
             sudo docker-compose up -d --build
