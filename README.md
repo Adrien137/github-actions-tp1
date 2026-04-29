@@ -22,6 +22,7 @@ L’API permet de :
 Exemples de routes :
 
 * `GET /health`
+* `GET /metrics`
 * `GET /api/tasks`
 * `POST /api/tasks`
 * `PUT /api/tasks/{id}`
