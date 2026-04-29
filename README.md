@@ -18,6 +18,7 @@ L’API permet de :
 * supprimer une tâche
 * vérifier l’état de l’application avec `/health`
 
+
 Exemples de routes :
 
 * `GET /health`
@@ -43,7 +44,7 @@ L’objectif était de reproduire une vraie usine logicielle moderne avec CI/CD,
 
 Cependant, les limitations de droits sur Azure (notamment sur Entra ID et App Registration) ont empêché la création du Service Principal nécessaire à l’authentification GitHub → Azure.
 
-Une adaptation a donc été mise en place avec un déploiement local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
+Une adaptation a donc été mise en place avec un déploiement au préalable de la VM sur azure puis une connexion ssh vers la vm afin d'executer la suite de la pipeline local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
 
 
 ## Déploiement
@@ -214,11 +215,6 @@ Exemple :
 
 ---
 
-
-
-
----
-
 ## Supervision
 
 Une route de supervision simple a été ajoutée :
@@ -237,9 +233,12 @@ Exemple de retour :
 Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
 
 ---
+
+## Metrics
+
 Une route de supervision supplémentaire a été ajoutée à travers :
 
-/metrics
+GET /metrics
 
 Cela permet d’avoir une supervision plus détaillée de l’application.
 
