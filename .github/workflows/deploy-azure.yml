@@ -17,14 +17,14 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USERNAME }}
+          username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            if [ ! -d "${{ secrets.REPO_NAME }}" ]; then
-              git clone https://github.com/Adrien137/github-actions-tp1.git ${{ secrets.REPO_NAME }}
+            if [ ! -d "github-actions-tp1" ]; then
+              git clone https://github.com/Adrien137/github-actions-tp1.git github-actions-tp1
             fi
 
-            cd ${{ secrets.REPO_NAME }}
+            cd github-actions-tp1
             git pull origin main
 
             sudo apt-get install -y docker-compose-plugin
