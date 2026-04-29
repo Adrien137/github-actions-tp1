@@ -164,7 +164,8 @@ features/nom-de-la-feature
 1. Création d'une nouvelle branche (exemple: `features/nom-de-la-feature`)
 2. Push sur GitHub
 3. GitHub Actions lance les tests
-4. Si tout est valide → merge vers `main`
+4. Si tout est valide → merge vers `develop`
+5. Si la PR est validée → merge sur `main`
 
 Cela permet d’éviter de pousser directement en production et respecte les bonnes pratiques GitOps.
 
