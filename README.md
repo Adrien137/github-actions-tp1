@@ -4,7 +4,7 @@
 
 Projet réalisé dans le cadre du module d’usine logicielle.
 
-L’objectif est de mettre en place une petite API REST en Python avec Flask permettant la gestion de tâches (CRUD), tout en intégrant une pipeline CI/CD avec GitHub Actions, Docker, Terraform, ansible et des bonnes pratiques GitOps.
+L’objectif est de mettre en place une petite API REST en Python avec Flask permettant la gestion de tâches, tout en intégrant une pipeline CI/CD avec GitHub Actions, Docker, Terraform, ansible et des bonnes pratiques GitOps.
 
 ---
 
@@ -45,6 +45,14 @@ Cependant, les limitations de droits sur Azure (notamment sur Entra ID et App Re
 
 Une adaptation a donc été mise en place avec un déploiement local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
 
+
+---
+
+l’application à été séparer en 3 fichiers pour avoir un code plus propre, plus lisible et plus maintenable.
+
+__init__.py : initialise Flask et enregistre les routes de l’API
+routes.py : contient toutes les routes HTTP de l’API REST (GET, POST, PUT, DELETE)
+services.py : contient la logique métier, c’est-à-dire la gestion des tâches (ajout, modification, suppression)
 
 ## Déploiement
 
@@ -275,9 +283,3 @@ Exemple :
 }
 
 Cela permet de suivre simplement l’état de l’application et d’avoir une première approche de supervision.
-
-## Amélioration futur possible
-
-- Ajout de SonarQube / SonarCloud pour centraliser l’analyse qualité
-
-- Affichage dans un dashboard des metrics, logs, infos du conteneur et de l'app avec prometheus pour récup les métrics, loki pour récupérer des logs, graphana pour afficher des dashboard
