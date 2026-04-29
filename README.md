@@ -127,7 +127,7 @@ Invoke-RestMethod -Method GET `
 
 ## GitHub Actions – Pipeline CI/CD
 
-La pipeline se lance automatiquement sur les branches `main` et `develop`.
+La pipeline se lance automatiquement sur les branches `develop` et ensuite vers `main` grâce à un merge.
 
 ### Étapes :
 
