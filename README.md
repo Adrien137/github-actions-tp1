@@ -263,9 +263,3 @@ Exemple :
 }
 
 Cela permet de suivre simplement l’état de l’application et d’avoir une première approche de supervision.
-
-## Amélioration futur possible
-
-- Ajout de SonarQube / SonarCloud pour centraliser l’analyse qualité
-
-- Affichage dans un dashboard des metrics, logs, infos du conteneur et de l'app avec prometheus pour récup les métrics, loki pour récupérer des logs, graphana pour afficher des dashboard
