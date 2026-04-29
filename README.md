@@ -256,3 +256,8 @@ Exemple de retour :
 }
 
 Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
+
+## Amélioration futur possible
+
+- Ajout de SonarQube / SonarCloud pour centraliser l’analyse qualité
+- Affichage dans un dashboard des metrics, logs, infos du conteneur et de l'app avec prometheus pour récup les métrics, loki pour récupérer des logs, graphana pour afficher des dashboard
