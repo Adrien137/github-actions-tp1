@@ -35,7 +35,7 @@ jobs:
         run: python -m pytest --cov=app --cov-report=term-missing --cov-report=xml --cov-fail-under=75
 
       - name: SonarQube Cloud scan
-        uses: SonarSource/sonarqube-scan-action@v5
+        uses: SonarSource/sonarqube-scan-action@2f77a1ec69fb1d595b06f35ab27e97605bdef703
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
