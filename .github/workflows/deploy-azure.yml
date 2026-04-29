@@ -3,37 +3,31 @@ name: Deploy Azure
 on:
   workflow_dispatch:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Azure login
-        uses: azure/login@v2
+      - name: Deploy on Azure VM
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            if [ ! -d "github-actions-tp1" ]; then
+              git clone https://github.com/Adrien137/github-actions-tp1.git github-actions-tp1
+            fi
 
-      - name: Build Docker image
-        run: docker build -t task-api:${{ github.sha }} .
+            cd github-actions-tp1
+            git pull origin main
 
-      - name: Push image to Azure Container Registry
-        run: |
-          az acr login --name ${{ secrets.ACR_NAME }}
-          docker tag task-api:${{ github.sha }} ${{ secrets.ACR_LOGIN_SERVER }}/task-api:${{ github.sha }}
-          docker push ${{ secrets.ACR_LOGIN_SERVER }}/task-api:${{ github.sha }}
+            sudo apt-get install -y docker-compose-plugin
 
-      - name: Deploy container to Azure Web App
-        run: |
-          az webapp config container set \
-            --name ${{ secrets.AZURE_WEBAPP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-            --docker-custom-image-name ${{ secrets.ACR_LOGIN_SERVER }}/task-api:${{ github.sha }} \
-            --docker-registry-server-url https://${{ secrets.ACR_LOGIN_SERVER }}
+            sudo docker compose down
+            sudo docker compose up -d --build
