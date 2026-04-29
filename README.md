@@ -1,10 +1,20 @@
-# Projet Usine Logiciel – API REST Task Manager
+# Projet Usine Logicielle – API REST Task Manager
 
 ## Présentation
 
 Projet réalisé dans le cadre du module d’usine logicielle.
 
-L’objectif est de mettre en place une petite API REST en Python avec Flask permettant la gestion de tâches, tout en intégrant une pipeline CI/CD avec GitHub Actions, Docker, Terraform, ansible et des bonnes pratiques GitOps.
+L’objectif est de mettre en place une API REST en Python avec Flask permettant la gestion de tâches (CRUD), tout en intégrant une vraie logique DevOps :
+
+* CI/CD avec GitHub Actions
+* conteneurisation Docker
+* Infrastructure as Code avec Terraform
+* configuration automatisée avec Ansible
+* déploiement sur VM Azure
+* supervision avec Prometheus et Grafana
+* bonnes pratiques GitOps
+
+Le projet permet de simuler une petite usine logicielle complète, proche d’un environnement professionnel.
 
 ---
 
@@ -17,10 +27,13 @@ L’API permet de :
 * modifier une tâche
 * supprimer une tâche
 * vérifier l’état de l’application avec `/health`
+* consulter les métriques avec `/metrics`
 
-Exemples de routes :
+Routes principales :
 
+* `GET /`
 * `GET /health`
+* `GET /metrics`
 * `GET /api/tasks`
 * `POST /api/tasks`
 * `PUT /api/tasks/{id}`
@@ -28,41 +41,134 @@ Exemples de routes :
 
 ---
 
+## Structure de l’application
+
+L’application est séparée en 3 fichiers pour garder un code propre et maintenable.
+
+### `__init__.py`
+
+Initialise Flask et enregistre les routes.
+
+### `routes.py`
+
+Contient toutes les routes HTTP de l’API REST.
+
+### `services.py`
+
+Contient la logique métier : ajout, modification, suppression et lecture des tâches.
+
+Cela permet de séparer :
+
+```text
+configuration
+↓
+routes API
+↓
+logique métier
+```
+
+---
+
 ## Réalisation initiale du projet
 
 Le projet était initialement prévu pour être déployé entièrement sur Azure avec une approche DevOps complète :
 
-- Déploiement automatisé sur Azure Web App
-- Stockage de l’image dans Azure Container Registry (ACR)
-- Authentification via le Service Principal grâce aux AZURE_CREDENTIALS
-- Infrastructure as Code avec Terraform
-- Configuration automatisée de l'infrastructure Terraform avec Ansible
-- intégration complète avec GitHub Actions
+* Azure Web App
+* Azure Container Registry (ACR)
+* Service Principal
+* App Registration
+* déploiement GitHub → Azure
+* Terraform
+* Ansible
 
-L’objectif était de reproduire une vraie usine logicielle moderne avec CI/CD, conteneurisation, déploiement cloud et automatisation de l’infrastructure.
+L’objectif était de reproduire une vraie architecture cloud moderne.
 
-Cependant, les limitations de droits sur Azure (notamment sur Entra ID et App Registration) ont empêché la création du Service Principal nécessaire à l’authentification GitHub → Azure.
+Cependant, les limitations du compte étudiant Azure ont empêché l’utilisation complète de Entra ID et la création du Service Principal nécessaire à l’authentification GitHub → Azure.
 
-Une adaptation a donc été mise en place avec un déploiement local Docker, tout en conservant la logique DevOps et la pipeline CI/CD.
+Le projet a donc été réorienté vers une solution plus réaliste et compatible :
 
+## VM Azure Ubuntu + déploiement SSH
 
----
+Cette solution permet :
 
-l’application à été séparer en 3 fichiers pour avoir un code plus propre, plus lisible et plus maintenable.
+* de contourner les limitations Azure
+* de garder Terraform et Ansible
+* de conserver un vrai déploiement automatisé
+* de rester cohérent avec les principes DevOps
 
-__init__.py : initialise Flask et enregistre les routes de l’API
-routes.py : contient toutes les routes HTTP de l’API REST (GET, POST, PUT, DELETE)
-services.py : contient la logique métier, c’est-à-dire la gestion des tâches (ajout, modification, suppression)
-
-## Déploiement
-
-Au vu de la situation ne permettant pas l’utilisation complète des services Azure (droits limités sur Entra ID / App Registration), le déploiement a été réalisé en local via Docker.
-
-L’objectif reste le même : conteneuriser l’application et automatiser son exécution.
+GitHub Actions se connecte donc en SSH sur la VM Azure pour exécuter le déploiement du conteneur.
 
 ---
 
-## Lancer le conteneur Docker
+## Connexion Azure en ligne de commande
+
+Avant Terraform, il faut se connecter à Azure :
+
+```powershell
+az login
+```
+
+Cela ouvre la fenêtre de connexion Microsoft et permet à Terraform d’utiliser le compte Azure directement.
+
+Cette méthode permet d’éviter le blocage lié au Service Principal sur le compte étudiant.
+
+---
+
+## Terraform – Création de la VM Azure
+
+Terraform permet de créer automatiquement :
+
+* Resource Group
+* Réseau virtuel
+* IP publique
+* NSG
+* VM Ubuntu Linux
+
+Exécution :
+
+```powershell
+terraform init
+terraform plan
+terraform apply
+```
+
+Terraform permet de versionner l’infrastructure et d’éviter la création manuelle sur Azure.
+
+---
+
+## Clé SSH et pipeline
+
+Lors de la création de la VM Azure, une clé SSH est générée.
+
+Cette clé est obligatoire pour permettre à GitHub Actions de se connecter à la VM.
+
+### Important
+
+Il faut récupérer :
+
+## la clé privée
+
+Exemple :
+
+```text
+-----BEGIN OPENSSH PRIVATE KEY-----
+...
+-----END OPENSSH PRIVATE KEY-----
+```
+
+et non la clé publique :
+
+```text
+ssh-rsa AAAA...
+```
+
+Cette clé privée est stockée dans GitHub Secrets.
+
+---
+
+## Déploiement Docker local
+
+En parallèle, un déploiement local Docker a été conservé pour les tests rapides.
 
 ### Build de l’image
 
@@ -76,11 +182,12 @@ docker build -t task-api .
 docker run -d --name task-api -p 5000:5000 task-api
 ```
 
-### Vérifier l’API
+### Vérification
 
 ```text
 http://localhost:5000/
 http://localhost:5000/health
+http://localhost:5000/metrics
 http://localhost:5000/api/tasks
 ```
 
@@ -93,9 +200,9 @@ docker rm task-api
 
 ---
 
-## Gestion des tâches avec Invoke-RestMethod sur PowerShell
+## Gestion des tâches avec PowerShell
 
-## Ajouter une tâche
+### Ajouter une tâche
 
 ```powershell
 $body = '{"title":"Nouvelle tache"}'
@@ -106,98 +213,187 @@ Invoke-RestMethod -Method POST `
   -Body $body
 ```
 
-## Modifier une tâche
+### Modifier une tâche
 
 ```powershell
 $body = '{"done": true}'
 
 Invoke-RestMethod -Method PUT `
-  -Uri "http://localhost:5000/api/tasks/1" `
+  -Uri "http://localhost:5000/api/tasks/2" `
   -ContentType "application/json" `
   -Body $body
 ```
 
-## Supprimer une tâche
+### Supprimer une tâche
 
 ```powershell
 Invoke-RestMethod -Method DELETE `
   -Uri "http://localhost:5000/api/tasks/1"
 ```
 
-## Pour voir les tâches
+### Voir les tâches
 
-```Powershell
+```powershell
 Invoke-RestMethod -Method GET `
   -Uri "http://localhost:5000/api/tasks"
 ```
 
 ---
 
-## GitHub Actions – Pipeline CI/CD
+## GitHub Actions – CI/CD
 
-La pipeline se lance automatiquement sur les branches `develop` et ensuite vers `main` grâce à un merge.
+Deux workflows sont utilisés.
 
-### Étapes :
+## 1er workflows : `ci.yml`
 
-1. Vérification du code avec Ruff
-2. Scan sécurité avec Bandit
-3. Lancement des tests avec pytest
-4. Vérification de la couverture de tests
-5. Analyse qualité avec SonarCloud
-6. Build de l’image Docker
+Exécuté sur :
 
-Si une étape échoue, la pipeline s’arrête.
+* `develop`
+* `main`
+
+Contient :
+
+### Ruff
+
+Analyse qualité du code Python.
+
+### Bandit
+
+Analyse sécurité du code Python.
+
+### Pytest
+
+Tests automatisés de l’API.
+
+### Coverage
+
+Mesure le pourcentage de code testé.
+
+### Docker Build
+
+Validation du Dockerfile.
+
+### Trivy
+
+Scan de sécurité de l’image Docker.
+
+### Son but
+
+Valider le projet avant le déploiement.
+
+---
+
+## 2ème workflows : `deploy.yml`
+
+Exécuté sur :
+
+* `main`
+* `develop`
+
+Contient :
+
+* connexion SSH à la VM Azure
+* git pull
+* docker build
+* docker run
+* redéploiement automatique
 
 ---
 
 ## GitOps / Git Flow
 
-Le développement se fait sur des branches secondaires :
+Le développement se fait sur :
 
 ```text
 develop
-features/nom-de-la-feature
 ```
 
-### Processus
+Processus complet :
 
-1. Création d'une nouvelle branche (exemple: `features/nom-de-la-feature`)
-2. Push sur GitHub
-3. GitHub Actions lance les tests
-4. Si tout est valide → merge vers `develop`
-5. Si la PR est validée → merge sur `main`
+1. développement sur `develop`
+2. push GitHub
+3. lancement automatique des tests CI
+4. validation
+5. merge vers `main`
+6. déploiement automatique sur la VM Azure
 
-Cela permet d’éviter de pousser directement en production et respecte les bonnes pratiques GitOps.
+Cela respecte les bonnes pratiques GitOps de l'usine logiciel.
 
 ---
 
-## Secrets GitHub
+## GitHub Secrets
 
-Les secrets sont stockés dans :
+Stockage :
 
 ```text
 GitHub → Settings → Secrets and variables → Actions
 ```
 
-Ils permettent de stocker de façon sécurisée les informations sensibles (credentials, clés SSH, variables de déploiement, etc.) sans les écrire dans le code.
+Secrets utilisés :
+
+* `VM_HOST`
+* `VM_USER`
+* `VM_SSH_KEY`
+* `VM_APP_PATH`
+* `SONAR_TOKEN`
+
+Ils permettent à GitHub Actions de se connecter en SSH à la VM Azure sans exposer d’informations sensibles dans le code. Ainsi que la connexion vers le sonarcloud.
+
+---
+
+## Supervision – Prometheus + Grafana
+
+Une supervision a été ajoutée pour suivre l’état de l’application.
+
+## `/health`
+
+Permet de vérifier rapidement si l’application fonctionne.
 
 Exemple :
 
-En temps normal, la nomenclature des secrets à utiliser seraient :
+```json
+{
+  "status": "ok",
+  "service": "task-api"
+}
+```
 
-* AZURE_CREDENTIALS
-* ACR_NAME
-* ACR_LOGIN_SERVER
-* AZURE_WEBAPP_NAME
-* AZURE_RESOURCE_GROUP
+## `/metrics`
 
-Mais par soucis de compte Azure, la création de la VM a été réalisée depuis notre machine (avec terraform init, plan et apply) :
+Permet de récupérer des métriques applicatives :
 
-* SONAR_TOKEN
-* VM_APP_PATH
-* VM_HOST
-* VM_SSH_KEY
-* VM_USER
+* service
+* version
+* nombre total de tâches
+* tâches terminées
+* tâches en attente
+
+Exemple :
+
+```json
+{
+  "service": "task-api",
+  "version": "1.0.0",
+  "total_tasks": 5,
+  "completed_tasks": 2,
+  "pending_tasks": 3
+}
+```
+
+## Pourquoi Prometheus + Grafana
+
+Prometheus permet de récupérer automatiquement les métrriques de supervision.
+
+Grafana permet d’afficher ces données dans des dashboards plus lisibles.
+
+Cela permet :
+
+* supervision applicative
+* suivi de disponibilité
+* visibilité sur l’activité
+* démonstration DevOps plus complète
+
+Cela apporte une vraie dimension monitoring au projet grâce à des dashboard plus compréhensibles et plus beaux que des metrics simples et directes
 
 ---
 
@@ -208,79 +404,28 @@ Mais par soucis de compte Azure, la création de la VM a été réalisée depuis
 * Docker
 * GitHub
 * GitHub Actions
+* Terraform
+* Ansible
+* Azure VM
+* Prometheus
+* Grafana
 * Ruff
 * Bandit
-* SonarCloud
 * Pytest
-* Azure (VM)
 * Trivy
+* Sonarcloud
 
 ---
 
-## Supervision et métriques
+## Conclusion
 
-L’application possède deux endpoints de supervision :
+Ce projet permet de démontrer :
 
-GET /health
-GET /metrics
-/health
-
-Permet de vérifier rapidement si l’application et le conteneur Docker sont bien disponibles.
-
-Exemple :
-
-{
-  "status": "ok",
-  "service": "task-api"
-}
-
----
-
-
-
-
----
-
-## Supervision
-
-Une route de supervision simple a été ajoutée :
-
-GET /health
-
-Cela permet de vérifier rapidement que l’application fonctionne correctement.
-
-Exemple de retour :
-
-{
-  "status": "ok",
-  "service": "task-api"
-}
-
-Cette route peut être utilisée par un outil de monitoring comme Prometheus ou simplement pour vérifier l’état du conteneur Docker.
-
----
-Une route de supervision supplémentaire a été ajoutée à travers :
-
-/metrics
-
-Cela permet d’avoir une supervision plus détaillée de l’application.
-
-Exemple de métriques récupérées :
-
-nom du service
-version de l’application
-nombre total de tâches
-nombre de tâches terminées
-nombre de tâches en attente
-
-Exemple :
-
-{
-  "service": "task-api",
-  "version": "1.0.0",
-  "total_tasks": 5,
-  "completed_tasks": 2,
-  "pending_tasks": 3
-}
-
-Cela permet de suivre simplement l’état de l’application et d’avoir une première approche de supervision.
+* API REST
+* CI/CD
+* conteneurisation
+* sécurité DevSecOps
+* Infrastructure as Code
+* déploiement cloud
+* supervision
+* l'opération GitOps
